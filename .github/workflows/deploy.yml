@@ -3,11 +3,7 @@ on:
  push:
    branches:
      - main
- workflow_dispatch:
-   inputs:
-     manual-apply:
-       description: 'Manually trigger Terraform Apply'
-       default: 'false'
+   workflow_dsipatch:
 jobs:
  deploy:
    runs-on: ubuntu-latest
@@ -24,15 +20,11 @@ jobs:
        uses: hashicorp/setup-terraform@v1
      - name: Terraform Init
        run: terraform init
-     - name: Terraform Plan
-       run: terraform plan -out=tfplan
+ 
  terraform-apply:
    runs-on: ubuntu-latest
    needs: deploy
-   if: github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_run.requested' && matrix.manual-apply == 'true'
-   strategy:
-     matrix:
-       manual-apply: [true, false]
+   if: github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_run.requested'
    steps:
      - name: Checkout code
        uses: actions/checkout@v2
@@ -41,11 +33,3 @@ jobs:
        env:
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
- manual-apply-approval:
-   runs-on: ubuntu-latest
-   needs: terraform-apply
-   if: needs.terraform-apply.result == 'success' && github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_run.requested'
-   steps:
-     - name: Manual Apply Approval
-       id: manual-apply-approval
-       run: echo "Approve Terraform Apply"
