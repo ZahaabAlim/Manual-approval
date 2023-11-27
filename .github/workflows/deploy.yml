@@ -8,6 +8,9 @@ on:
         description: 'Apply Terraform (true or false)' # ask for user input
         required: true
         default: 'false'
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
