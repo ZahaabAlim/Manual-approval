@@ -13,7 +13,7 @@ provider "aws" {
 }
 #creating s3 bucket
 resource "aws_s3_bucket" "factorial_bucket" {
-  bucket = "zahaab-manual-bucket"
+  bucket = "zahaab-manua-bucket"
   acl= "private"
 }
 #adding object to s3 bucket
