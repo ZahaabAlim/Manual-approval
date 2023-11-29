@@ -32,7 +32,7 @@ jobs:
    needs: plan
    runs-on: ubuntu-latest
    env:
-    GH_TOKEN: ${{ GH_Tokem}}
+    GH_TOKEN: ${{GH_Token}}
    steps:
      - name: Checkout
        uses: actions/checkout@v2
