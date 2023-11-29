@@ -50,5 +50,4 @@ jobs:
        if: ${{ github.event_name == 'workflow_dispatch' || github.event.inputs.apply_terraform == 'true' }}
        # Check the user input or trigger
        run: terraform apply plan.out
-       env:
-       token: ${{ secrets.GITHUB_TOKEN }}
+       
