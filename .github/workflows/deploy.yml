@@ -51,8 +51,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: plan
-       - name: output contents
-       run: ls    
+      - name: output contents
+        run: ls    
  
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
