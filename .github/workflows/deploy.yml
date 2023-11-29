@@ -4,6 +4,8 @@ on:
  push:
    branches:
      - main
+     env:
+       token: ${{ secrets.GITHUB_TOKEN }}
 jobs:
  plan:
    runs-on: ubuntu-latest
@@ -42,8 +44,7 @@ jobs:
        run: ls -R
      - name: Review and Approve
        run: gh pr review --approve
-      with:
-       token: ${{ secrets.GITHUB_TOKEN }}
+     
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v1
      - name: Terraform Apply
