@@ -19,12 +19,12 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=plan.out
       - name: Upload Plan Artifact
         uses: actions/upload-artifact@v2
         with:
           name: terraform-plan
-          path: tfplan
+          path: plan.out
       - name: Manual Approval
         uses: trstringer/manual-approval@v1
         with:
