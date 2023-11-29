@@ -1,61 +1,41 @@
-name: Terraform CI/CD
-
+name: Deploy to S3
 on:
   push:
     branches:
       - main
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-
-      - name: Terraform init
-        run: terraform init
-
-      - name: Terraform plan
-        run: terraform plan -out=plan.tfplan
-
-      - name: Save plan to artifact
+          python-version: 3.9
+      - name: Run Python Script
+        run: python factorial.py
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+      - name: Upload Plan Artifact
         uses: actions/upload-artifact@v2
         with:
           name: terraform-plan
-          path: plan.tfplan
-
-  review:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download plan artifact
-        uses: actions/download-artifact@v2
+          path: tfplan
+      - name: Manual Approval
+        uses: trstringer/manual-approval@v1
         with:
-          name: terraform-plan
-
-      - name: Review plan
-        run: terraform show -json plan.tfplan > plan.json
-
-      - name: Approve plan
-        run: echo "Approved" > approval.txt
-
-  apply:
-    needs: review
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download approved plan
-        uses: actions/download-artifact@v2
-        with:
-          name: terraform-plan
-
-      - name: Terraform apply
-        run: terraform apply -auto-approve -input=false plan.tfplan
+          token: ${{ secrets.GITHUB_TOKEN }}
+          approvers: user1
+          minimum-approvals: 1
+          issue-title: "Deploying v1.3.5 to prod from staging"
+          issue-body: "Please approve or deny the deployment of version v1.3.5."
+          exclude-workflow-initiator-as-approver: false
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
