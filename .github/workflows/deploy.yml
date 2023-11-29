@@ -1,63 +1,49 @@
 name: Deploy Python file to S3
- 
 on:
-  workflow_dispatch: # enable manual trigger
-    inputs:
-      apply_terraform:
-        description: 'Apply Terraform (true or false)' # ask for user input
-        required: true
-        default: 'false'
-  push:
-    branches:
-      - main
- 
+ workflow_dispatch:  # enable manual trigger
+ push:
+   branches:
+     - main
 jobs:
-  plan:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
- 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
- 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
- 
-      - name: Terraform Init
-        run: terraform init
- 
-      - name: Terraform Plan
-        run: terraform plan -out=plan.out # save the plan output
- 
-      - name: Upload Plan
-        uses: actions/upload-artifact@v3
-        with:
-          name: plan
-          path: plan.out
- 
-  apply:
-    needs: plan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
- 
-      - name: Download Plan
-        uses: actions/download-artifact@v3
-        with:
-          name: plan
-      - name: output contents
-        run: ls    
- 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
- 
-      - name: Terraform Apply
-        if: ${{ github.event.inputs.apply_terraform == 'true' }} # check the user input
-        run: terraform apply plan.out # apply the saved plan
- 
+ plan:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+     - name: Setup Terraform
+       uses: hashicorp/setup-terraform@v1
+     - name: Configure AWS credentials
+       uses: aws-actions/configure-aws-credentials@v1
+       with:
+         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     - name: Terraform Init
+       run: terraform init
+     - name: Terraform Plan
+       run: terraform plan -out=plan.out
+       # Save the plan output
+     - name: Upload Plan
+       uses: actions/upload-artifact@v3
+       with:
+         name: plan
+         path: plan.out
+ apply:
+   needs: plan
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+     - name: Download Plan
+       uses: actions/download-artifact@v3
+       with:
+         name: plan
+     - name: Output contents
+       run: ls -R
+     - name: Review and Approve
+       run: gh pr review --approve
+     - name: Setup Terraform
+       uses: hashicorp/setup-terraform@v1
+     - name: Terraform Apply
+       if: ${{ github.event_name == 'workflow_dispatch' || github.event.inputs.apply_terraform == 'true' }}
+       # Check the user input or trigger
+       run: terraform apply plan.out
