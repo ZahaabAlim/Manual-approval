@@ -40,18 +40,19 @@ jobs:
           name: plan
           path: plan.out
  
- # apply:
-  #  needs: plan
-   # runs-on: ubuntu-latest
-    #steps:
+  apply:
+   needs: plan
+    runs-on: ubuntu-latest
+    steps:
       #- name: Checkout
         #uses: actions/checkout@v2
  
-      #- name: Download Plan
-       # uses: actions/download-artifact@v2
-       # with:
-       #   name: plan
- 
+      - name: Download Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: plan
+      - name: Output Contents
+        run: ls  
      # - name: Setup Terraform
        # uses: hashicorp/setup-terraform@v1
  
