@@ -41,7 +41,7 @@ jobs:
           path: plan.out
  
   apply:
-   needs: plan
+    needs: plan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,11 +51,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: plan
-      - name: Output Contents
-        run: ls  
-     # - name: Setup Terraform
-       # uses: hashicorp/setup-terraform@v1
  
-     # - name: Terraform Apply
-       # if: ${{ github.event.inputs.apply_terraform == 'true' }} # check the user input
-       # run: terraform apply plan.out # apply the saved plan
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+ 
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.apply_terraform == 'true' }} # check the user input
+        run: terraform apply plan.out # apply the saved plan
+ 
