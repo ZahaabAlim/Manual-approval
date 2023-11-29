@@ -4,7 +4,6 @@ on:
  push:
    branches:
      - main
-     
 jobs:
  plan:
    runs-on: ubuntu-latest
@@ -18,7 +17,6 @@ jobs:
        with:
          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-         aws-region: us-east-1
      - name: Terraform Init
        run: terraform init
      - name: Terraform Plan
@@ -42,14 +40,10 @@ jobs:
      - name: Output contents
        run: ls -R
      - name: Review and Approve
-       run: gh pr review --approve
-        env:
-          GH_TOKEN: ${{ github.GH_TOKEN }}
-     
+       run: gh pr review --approve --token ${{ secrets.GITHUB_TOKEN }}
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v1
      - name: Terraform Apply
        if: ${{ github.event_name == 'workflow_dispatch' || github.event.inputs.apply_terraform == 'true' }}
        # Check the user input or trigger
        run: terraform apply plan.out
-       
