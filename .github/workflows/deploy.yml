@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # for manual triggering
+
 jobs:
-  deploy:
+  plan:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -26,3 +28,26 @@ jobs:
       with:
         name: terraform-plan
         path: plan.out
+
+  review:
+    needs: plan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v2
+      with:
+        name: terraform-plan
+    - name: Review and Approve
+      run: echo "Review the terraform plan here and approve it manually"
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+    - name: Terraform Apply
+      run: |
+        read -p "Do you want to apply the plan (yes/no)? " answer
+        if [ "$answer" == "yes" ]
+        then
+          terraform apply -auto-approve plan.out
+        fi
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
