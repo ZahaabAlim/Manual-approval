@@ -41,7 +41,7 @@ jobs:
      - name: Output contents
        run: ls -R
      - name: Review and Approve
-       run: gh pr review --approve --token ${{ secrets.GITHUB_TOKEN }}
+       run: gh pr review --approve
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v1
      - name: Terraform Apply
