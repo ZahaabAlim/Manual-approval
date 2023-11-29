@@ -17,7 +17,6 @@ jobs:
        with:
          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-         token: ${{ secrets.TOKEN}}
          aws-region: us-east-1
      - name: Terraform Init
        run: terraform init
@@ -32,7 +31,8 @@ jobs:
  apply:
    needs: plan
    runs-on: ubuntu-latest
-  
+   env:
+     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
    steps:
      - name: Checkout
        uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
      - name: Output contents
        run: ls -R
      - name: Review and Approve
-       run: gh pr review --approve
+       run: gh auth login --with-token "${GH_TOKEN}" && gh pr review --approve
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v1
      - name: Terraform Apply
