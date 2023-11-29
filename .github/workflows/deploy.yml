@@ -44,7 +44,7 @@ jobs:
      - name: Review and Approve
        run: gh pr review --approve
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.GH_TOKEN }}
      
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v1
