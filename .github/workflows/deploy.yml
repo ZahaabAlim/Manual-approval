@@ -41,7 +41,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: plan
-          path: terraform_plan.txt
+          path: |
+            terraform_plan.txt
+            plan.out
   apply:
     needs: plan
     runs-on: ubuntu-latest
@@ -67,4 +69,4 @@ jobs:
  
       - name: Terraform Apply
         if: ${{ github.event.inputs.apply_terraform == 'true' }} # check the user input
-        run: terraform apply plan # apply the saved plan    
+        run: terraform apply plan.out # apply the saved plan    
