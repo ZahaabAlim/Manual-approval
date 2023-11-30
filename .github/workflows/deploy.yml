@@ -32,20 +32,17 @@ jobs:
         run: terraform init
  
       - name: Terraform Plan
-        run: |
-          terraform plan -out=plan.out 
-          upload=$( terraform plan -out=plan.out)
-          echo "TERRAFORM_PLAN=$upload" > terraform_plan.txt
+        run: terraform plan -out=plan.out # save the plan output
+ 
       - name: Upload Plan
         uses: actions/upload-artifact@v2
         with:
           name: plan
-          path: terraform_plan.txt
+          path: plan.out
  
   apply:
     needs: plan
     runs-on: ubuntu-latest
-     
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -54,14 +51,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: plan
-       
-      - name: Plan Output
-        run: |
-          output=$(cat terraform_plan.txt)
-          echo "Plan output : $output"
-      
-      - name: Output contents
-        run: ls -R
+ 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
  
