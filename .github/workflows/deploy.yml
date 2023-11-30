@@ -33,8 +33,8 @@ jobs:
  
       - name: Terraform Plan
         run: | 
-          result=$( terraform plan -out=plan.out)
-          echo "TERRAFORM_PLAN=$result" > terraform_plan.txt
+          upload=$( terraform plan -out=plan.out)
+          echo "TERRAFORM_PLAN=$upload" > terraform_plan.txt
       - name: Upload Plan
         uses: actions/upload-artifact@v2
         with:
@@ -53,7 +53,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: plan
- 
+
+      - name: Plan Output
+        run: |
+          output=$(cat terraform_plan.txt)
+          echo "Plan output : $output"
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
  
