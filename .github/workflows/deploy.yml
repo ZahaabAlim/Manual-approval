@@ -32,13 +32,14 @@ jobs:
         run: terraform init
  
       - name: Terraform Plan
-        run: terraform plan -out=plan.out # save the plan output
- 
+        run: | 
+          result=$( terraform plan -out=plan.out)
+          echo "TERRAFORM_PLAN=$result" > terraform_plan.txt
       - name: Upload Plan
         uses: actions/upload-artifact@v2
         with:
           name: plan
-          path: plan.out
+          path: terraform_plan.txt
  
   apply:
     needs: plan
