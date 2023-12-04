@@ -13,7 +13,7 @@ on:
       - main
  
 jobs:
-  deploy:
+  plan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,9 +33,40 @@ jobs:
         run: terraform init
  
       - name: Terraform Plan
-        run: terraform plan -out=plan.out # save the plan output
+        run: |
+          terraform plan -out=plan.out
+          upload=$( terraform plan -out=plan.out)
+          echo "TERRAFORM_PLAN=$upload" > terraform_plan.txt
+      - name: Upload Plan
+        uses: actions/upload-artifact@v2
+        with:
+          name: plan
+          path: |
+            terraform_plan.txt
+            plan.out
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+     
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+ 
+      - name: Download Plan
+        uses: actions/download-artifact@v2
+        with:
+          name: plan
+       
+      - name: Plan Output
+        run: |
+          output=$(cat terraform_plan.txt)
+          echo "Plan output : $output"
+     
+      - name: Output contents
+        run: ls -R
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
  
       - name: Terraform Apply
         if: ${{ github.event.inputs.apply_terraform == 'true' }} # check the user input
-        run: terraform apply plan.out # apply the saved plan
- 
+        run: terraform apply plan.out # apply the saved plan    
