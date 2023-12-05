@@ -37,16 +37,7 @@ jobs:
           path: |
             terraform_plan.txt
             plan.out
-  apply:
-    needs: plan
-    runs-on: ubuntu-latest
-    environment: approver
-     
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
- 
-      - name: Download Plan
+       - name: Download Plan
         uses: actions/download-artifact@v2
         with:
           name: plan
@@ -56,7 +47,15 @@ jobs:
           output=$(cat terraform_plan.txt)
           echo "Plan output : $output"
       - name: Output contents
-        run: ls -R
+        run: ls -R            
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: approver
+     
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
  
