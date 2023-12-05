@@ -1,6 +1,12 @@
 name: Deploy Python file to S3
  
 on:
+  workflow_dispatch: # enable manual trigger
+    inputs:
+      apply_terraform:
+        description: 'Apply Terraform (true or false)' # ask for user input
+        required: true
+        default: 'false'
   push:
     branches:
       - main
@@ -60,4 +66,4 @@ jobs:
         uses: hashicorp/setup-terraform@v1
  
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply
