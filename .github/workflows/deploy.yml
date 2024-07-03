@@ -1,5 +1,5 @@
-name: Deploy Python file to S3
- 
+name: Deploy  Python file to S3
+  
 on:
   workflow_dispatch: # enable manual trigger
     inputs:
